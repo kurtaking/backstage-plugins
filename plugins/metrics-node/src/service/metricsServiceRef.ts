@@ -1,6 +1,6 @@
 import { coreServices, createServiceFactory, createServiceRef } from '@backstage/backend-plugin-api';
 import { MetricsService } from './MetricsService';
-import { DefaultMetricsService } from './DefaultMetricsService';
+import { rootMetricsServiceRef } from './RootMetricsService';
 
 /**
  * Service reference for the metrics service.
@@ -16,11 +16,10 @@ export const metricsServiceRef = createServiceRef<MetricsService>({
       deps: {
         logger: coreServices.logger,
         pluginMetadata: coreServices.pluginMetadata,
+        rootMetricsService: rootMetricsServiceRef,
       },
-      factory({ logger, pluginMetadata }) {
-        return DefaultMetricsService.create({
-          logger,
-        }).forPlugin({
+      factory({ pluginMetadata, rootMetricsService }) {
+        return rootMetricsService.forPlugin({
           pluginId: pluginMetadata.getId(),
         });
       },
