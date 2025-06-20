@@ -7303,6 +7303,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kurtaking/plugin-metrics-node@workspace:plugins/metrics-node":
+  version: 0.0.0-use.local
+  resolution: "@kurtaking/plugin-metrics-node@workspace:plugins/metrics-node"
+  dependencies:
+    "@backstage/backend-plugin-api": "npm:^1.4.0"
+    "@backstage/cli": "npm:^0.33.0"
+    "@opentelemetry/api": "npm:^1.9.0"
+  languageName: unknown
+  linkType: soft
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.5
   resolution: "@leichtgewicht/ip-codec@npm:2.0.5"
