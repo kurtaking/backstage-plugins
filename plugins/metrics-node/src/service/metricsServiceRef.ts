@@ -1,5 +1,6 @@
 import { createServiceFactory, createServiceRef } from '@backstage/backend-plugin-api';
 import { MetricsService } from './MetricsService';
+import { DefaultMetricsService } from './DefaultMetricsService';
 
 /**
  * Service reference for the metrics service.
@@ -15,7 +16,7 @@ export const metricsServiceRef = createServiceRef<MetricsService>({
       deps: {
       },
       factory() {
-        throw new Error('Metrics service is not implemented');
+        return DefaultMetricsService.create();
       },
     });
   },
