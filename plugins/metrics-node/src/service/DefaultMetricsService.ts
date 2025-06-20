@@ -1,7 +1,6 @@
 import { metrics, Meter } from '@opentelemetry/api';
 import { CounterMetric } from "../types";
-import { MetricsService, MetricsServicePluginOptions } from "./MetricsService";
-import { MetricOptions } from "../types/metadata";
+import { MetricsService, MetricsServicePluginOptions, MetricOptions } from "./MetricsService";
 import { LoggerService } from '@backstage/backend-plugin-api';
 
 export interface DefaultMetricsServiceOptions {
