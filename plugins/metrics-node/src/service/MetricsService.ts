@@ -1,9 +1,5 @@
 import { CounterMetric } from "../types";
 
-export interface MetricsServicePluginOptions {
-  pluginId: string;
-}
-
 export interface MetricOptions {
   /**
    * The description of the Metric.
@@ -18,7 +14,9 @@ export interface MetricOptions {
 
 
 export interface MetricsService {
-  forPlugin(opts: MetricsServicePluginOptions): MetricsService;
-
   createCounter(name: string, opts?: MetricOptions): CounterMetric;
+}
+
+export interface MetricsServicePluginOptions {
+  pluginId: string;
 }
