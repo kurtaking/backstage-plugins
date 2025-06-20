@@ -31,13 +31,13 @@ export default defineConfig({
   webServer: process.env.CI
     ? []
     : [
-        {
-          command: 'yarn dev',
-          port: 3000,
-          reuseExistingServer: true,
-          timeout: 60_000,
-        },
-      ],
+      {
+        command: 'yarn start',
+        port: 3000,
+        reuseExistingServer: true,
+        timeout: 60_000,
+      },
+    ],
 
   forbidOnly: !!process.env.CI,
 
