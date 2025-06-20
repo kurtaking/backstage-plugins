@@ -1,21 +1,38 @@
 import { metrics, Meter } from '@opentelemetry/api';
 import { CounterMetric } from "../types";
-import { MetricsService } from "./MetricsService";
+import { MetricsService, MetricsServicePluginOptions } from "./MetricsService";
 import { MetricOptions } from "../types/metadata";
+import { LoggerService } from '@backstage/backend-plugin-api';
+
+export interface DefaultMetricsServiceOptions {
+  logger: LoggerService;
+  pluginId?: string;
+}
 
 export class DefaultMetricsService implements MetricsService {
   private meter: Meter;
+  private logger: LoggerService;
+  private pluginId?: string;
 
-  private constructor () {
+  private constructor (opts: DefaultMetricsServiceOptions) {
     this.meter = metrics.getMeter('backstage-default');
+    this.logger = opts.logger;
   }
 
-  public static create(): MetricsService {
-    return new DefaultMetricsService();
+  public static create(opts: DefaultMetricsServiceOptions): MetricsService {
+    return new DefaultMetricsService(opts);
+  }
+
+  forPlugin(opts: MetricsServicePluginOptions): MetricsService {
+    return new DefaultMetricsService({
+      logger: this.logger,
+      pluginId: opts.pluginId,
+    });
   }
 
   createCounter(name: string, opts?: MetricOptions): CounterMetric {
-    const counter = this.meter.createCounter(name, {
+    const metricName = this.getMetricName(name);
+    const counter = this.meter.createCounter(metricName, {
       ...opts,
     });
 
@@ -28,5 +45,12 @@ export class DefaultMetricsService implements MetricsService {
         counter.add(value, labels);
       },
     };
+  }
+
+  private getMetricName(name: string): string {
+    if (this.pluginId) {
+      return `${this.pluginId}.${name}`;
+    }
+    return name;
   }
 }
