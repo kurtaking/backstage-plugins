@@ -6,9 +6,10 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { defaultResource, resourceFromAttributes } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
-import { MetricsService, RootMetricsService, MetricsServicePluginOptions, MetricOptions } from '../../definitions';
+import { MetricsService, RootMetricsService, MetricsServicePluginOptions } from '../../definitions';
+import { MetricOptions } from '../../types';
 import { PluginMetricsService } from '../PluginMetricsService';
-import { CounterMetric } from '../../types';
+import { CounterMetric, createCounterMetric, UpDownCounterMetric, createUpDownCounterMetric } from '../../instruments/counter';
 
 export async function createRootMetricsService(): Promise<RootMetricsService> {
   const rootServiceName = 'backstage';
@@ -35,25 +36,21 @@ export async function createRootMetricsService(): Promise<RootMetricsService> {
 
   const meter: Meter = metrics.getMeter(rootServiceName);
 
-  const forPlugin = (pluginOpts: MetricsServicePluginOptions): MetricsService => {
-    return new PluginMetricsService(pluginOpts.pluginId, rootServiceName);
+  const forPlugin = (opts: MetricsServicePluginOptions): MetricsService => {
+    return new PluginMetricsService(opts.pluginId, rootServiceName);
   };
 
-  const createCounter = (name: string, counterOpts?: MetricOptions): CounterMetric => {
-    const counter = meter.createCounter(name, counterOpts);
+  const createCounter = (name: string, opts?: MetricOptions): CounterMetric => {
+    return createCounterMetric(meter, name, opts);
+  };
 
-    return {
-      add: (value: number, labels?: Record<string, string>) => {
-        counter.add(value, labels);
-      },
-      increment: (labels?: Record<string, string>) => {
-        counter.add(1, labels);
-      },
-    };
+  const createUpDownCounter = (name: string, opts?: MetricOptions): UpDownCounterMetric => {
+    return createUpDownCounterMetric(meter, name, opts);
   };
 
   return {
     forPlugin,
     createCounter,
+    createUpDownCounter,
   };
 }

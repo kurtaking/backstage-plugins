@@ -1,10 +1,7 @@
-import { CounterMetric } from "../types";
+import { CounterMetric, UpDownCounterMetric } from '../instruments/counter';
+import { MetricOptions } from '../types';
 
 export interface MetricsService {
   createCounter(name: string, opts?: MetricOptions): CounterMetric;
-}
-
-export interface MetricOptions {
-  description?: string;
-  labels?: Record<string, string>;
+  createUpDownCounter(name: string, opts?: MetricOptions): UpDownCounterMetric;
 }
