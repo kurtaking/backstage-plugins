@@ -6,9 +6,10 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { defaultResource, resourceFromAttributes } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
-import { MetricsService, RootMetricsService, MetricsServicePluginOptions, MetricOptions } from '../../definitions';
+import { MetricsService, RootMetricsService, MetricsServicePluginOptions } from '../../definitions';
+import { MetricOptions } from '../../types';
 import { PluginMetricsService } from '../PluginMetricsService';
-import { CounterMetric, UpDownCounterMetric } from '../../types';
+import { CounterMetric, createCounterMetric, UpDownCounterMetric, createUpDownCounterMetric } from '../../instruments/counter';
 
 export async function createRootMetricsService(): Promise<RootMetricsService> {
   const rootServiceName = 'backstage';
@@ -40,38 +41,11 @@ export async function createRootMetricsService(): Promise<RootMetricsService> {
   };
 
   const createCounter = (name: string, opts?: MetricOptions): CounterMetric => {
-    const counter = meter.createCounter(name, opts);
-
-    return {
-      add: (value: number, labels?: Record<string, string>) => {
-        counter.add(value, labels);
-      },
-      increment: (labels?: Record<string, string>) => {
-        counter.add(1, labels);
-      },
-    };
+    return createCounterMetric(meter, name, opts);
   };
 
   const createUpDownCounter = (name: string, opts?: MetricOptions): UpDownCounterMetric => {
-    const counter = meter.createUpDownCounter(name, opts);
-
-    return {
-      add: (value: number, labels?: Record<string, string>) => {
-        counter.add(value, labels);
-      },
-
-      subtract: (value: number, labels?: Record<string, string>) => {
-        counter.add(-value, labels);
-      },
-
-      increment: (labels?: Record<string, string>) => {
-        counter.add(1, labels);
-      },
-
-      decrement: (labels?: Record<string, string>) => {
-        counter.add(-1, labels);
-      },
-    };
+    return createUpDownCounterMetric(meter, name, opts);
   };
 
   return {
