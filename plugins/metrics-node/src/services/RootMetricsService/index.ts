@@ -1,2 +1,1 @@
-export { rootMetricsServiceRef } from './rootMetricsServiceRef';
-export { rootMetricsServiceFactory } from './rootMetricsServiceFactory';
+export { rootMetricsServiceFactory, rootMetricsServiceRef } from './rootMetricsServiceFactory';
