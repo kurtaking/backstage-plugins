@@ -1,4 +1,3 @@
-import { RootLoggerService } from '@backstage/backend-plugin-api';
 import { MetricsService } from "./MetricsService";
 
 /**
@@ -8,10 +7,6 @@ import { MetricsService } from "./MetricsService";
  */
 export interface MetricsServicePluginOptions {
   pluginId: string;
-}
-
-export interface RootMetricsServiceOptions {
-  logger: RootLoggerService;
 }
 
 export interface RootMetricsService extends MetricsService {
