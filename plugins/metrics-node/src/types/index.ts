@@ -1,1 +1,1 @@
-export type { CounterMetric } from './counter';
+export type { CounterMetric, UpDownCounterMetric } from './counter';

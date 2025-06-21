@@ -1,5 +1,5 @@
 import { Meter, metrics } from "@opentelemetry/api";
-import { CounterMetric } from "../../types";
+import { CounterMetric, UpDownCounterMetric } from "../../types";
 import { MetricOptions, MetricsService } from "../../definitions";
 
 export class PluginMetricsService implements MetricsService {
@@ -19,6 +19,28 @@ export class PluginMetricsService implements MetricsService {
 
       increment: (labels?: Record<string, string>) => {
         counter.add(1, labels);
+      },
+    };
+  }
+
+  createUpDownCounter(name: string, opts?: MetricOptions): UpDownCounterMetric {
+    const counter = this.meter.createUpDownCounter(name, opts);
+
+    return {
+      add: (value: number, labels?: Record<string, string>) => {
+        counter.add(value, labels);
+      },
+
+      subtract: (value: number, labels?: Record<string, string>) => {
+        counter.add(-value, labels);
+      },
+
+      increment: (labels?: Record<string, string>) => {
+        counter.add(1, labels);
+      },
+
+      decrement: (labels?: Record<string, string>) => {
+        counter.add(-1, labels);
       },
     };
   }
