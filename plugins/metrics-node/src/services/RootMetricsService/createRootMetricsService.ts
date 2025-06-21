@@ -10,10 +10,17 @@ import { MetricsService, RootMetricsService, MetricsServicePluginOptions } from 
 import { MetricOptions } from '../../types';
 import { PluginMetricsService } from '../PluginMetricsService';
 import { CounterMetric, createCounterMetric, UpDownCounterMetric, createUpDownCounterMetric } from '../../instruments/counter';
+import { MetricsConfig } from '../../config';
 
-export async function createRootMetricsService(): Promise<RootMetricsService> {
-  const rootServiceName = 'backstage';
-  const rootServiceVersion = '0.0.0';
+interface RootMetricsServiceOptions {
+  config: MetricsConfig;
+}
+
+export async function createRootMetricsService(options: RootMetricsServiceOptions): Promise<RootMetricsService> {
+  const { config } = options;
+
+  const rootServiceName = config.resource?.serviceName ?? 'backstage';
+  const rootServiceVersion = config.resource?.serviceVersion ?? '0.0.0';
 
   const resource = defaultResource().merge(
     resourceFromAttributes({
@@ -24,7 +31,7 @@ export async function createRootMetricsService(): Promise<RootMetricsService> {
 
   const metricReader = new PeriodicExportingMetricReader({
     exporter: new ConsoleMetricExporter(),
-    exportIntervalMillis: 60000, // 60 seconds
+    exportIntervalMillis: config.collection?.exportIntervalMillis ?? 60000, // 60 seconds
   });
 
   const provider = new MeterProvider({
