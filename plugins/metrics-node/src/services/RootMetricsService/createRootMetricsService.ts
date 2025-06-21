@@ -1,28 +1,52 @@
-import { metrics, Meter } from '@opentelemetry/api';
-import { RootLoggerService } from '@backstage/backend-plugin-api';
+import { metrics } from '@opentelemetry/api';
+import {
+  ConsoleMetricExporter,
+  MeterProvider,
+  PeriodicExportingMetricReader
+} from '@opentelemetry/sdk-metrics';
+import { defaultResource, resourceFromAttributes } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { MetricsService, RootMetricsService, MetricsServicePluginOptions, MetricOptions } from '../../definitions';
 import { PluginMetricsService } from '../PluginMetricsService';
 import { CounterMetric } from '../../types';
 
-export interface RootMetricsServiceOptions {
-  logger: RootLoggerService;
-}
+export async function createRootMetricsService(): Promise<RootMetricsService> {
+  const rootServiceName = 'backstage';
+  const rootServiceVersion = '0.0.0';
 
-export async function createRootMetricsService(opts: RootMetricsServiceOptions): Promise<RootMetricsService> {
-  const meter = metrics.getMeter('backstage');
+  const resource = defaultResource().merge(
+    resourceFromAttributes({
+      [ATTR_SERVICE_NAME]: rootServiceName,
+      [ATTR_SERVICE_VERSION]: rootServiceVersion,
+    }),
+  );
+
+  const metricReader = new PeriodicExportingMetricReader({
+    exporter: new ConsoleMetricExporter(),
+    exportIntervalMillis: 60000, // 60 seconds
+  });
+
+  const provider = new MeterProvider({
+    resource,
+    readers: [metricReader],
+  });
+
+  metrics.setGlobalMeterProvider(provider);
 
   const forPlugin = (pluginOpts: MetricsServicePluginOptions): MetricsService => {
-    opts.logger.info('Creating scoped metrics service for plugin', { pluginId: pluginOpts.pluginId });
     return new PluginMetricsService(pluginOpts.pluginId);
   };
 
   const createCounter = (name: string, counterOpts?: MetricOptions): CounterMetric => {
+    const meter = metrics.getMeter(rootServiceName);
+    const counter = meter.createCounter(name, counterOpts);
+
     return {
       add: (value: number, labels?: Record<string, string>) => {
-        meter.createCounter(name, counterOpts).add(value, labels);
+        counter.add(value, labels);
       },
       increment: (labels?: Record<string, string>) => {
-        meter.createCounter(name, counterOpts).add(1, labels);
+        counter.add(1, labels);
       },
     };
   };
