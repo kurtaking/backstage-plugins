@@ -5,8 +5,8 @@ import { MetricOptions, MetricsService } from "../../definitions";
 export class PluginMetricsService implements MetricsService {
   private meter: Meter;
 
-  constructor (private readonly pluginId: string) {
-    this.meter = metrics.getMeter(`backstage.plugin.${this.pluginId}`);
+  constructor (private readonly pluginId: string, rootServiceName: string) {
+    this.meter = metrics.getMeter(`${rootServiceName}.plugin.${this.pluginId}`);
   }
 
   createCounter(name: string, opts?: MetricOptions): CounterMetric {

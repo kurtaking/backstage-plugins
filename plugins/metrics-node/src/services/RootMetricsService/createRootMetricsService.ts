@@ -1,4 +1,4 @@
-import { metrics } from '@opentelemetry/api';
+import { metrics, Meter } from '@opentelemetry/api';
 import {
   ConsoleMetricExporter,
   MeterProvider,
@@ -33,12 +33,13 @@ export async function createRootMetricsService(): Promise<RootMetricsService> {
 
   metrics.setGlobalMeterProvider(provider);
 
+  const meter: Meter = metrics.getMeter(rootServiceName);
+
   const forPlugin = (pluginOpts: MetricsServicePluginOptions): MetricsService => {
-    return new PluginMetricsService(pluginOpts.pluginId);
+    return new PluginMetricsService(pluginOpts.pluginId, rootServiceName);
   };
 
   const createCounter = (name: string, counterOpts?: MetricOptions): CounterMetric => {
-    const meter = metrics.getMeter(rootServiceName);
     const counter = meter.createCounter(name, counterOpts);
 
     return {
