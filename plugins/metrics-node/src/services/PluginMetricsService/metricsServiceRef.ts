@@ -1,9 +1,8 @@
 import { coreServices, createServiceFactory, createServiceRef } from '@backstage/backend-plugin-api';
-import { MetricsService } from './MetricsService';
-import { rootMetricsServiceRef } from './RootMetricsService';
+import { MetricsService } from '../../definitions/MetricsService';
 
 /**
- * Service reference for the metrics service.
+ * Service reference for the plugin-scoped metrics service.
  *
  * @public
  */
